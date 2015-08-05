@@ -6,8 +6,8 @@
 
 function statuscake_push_monitoring_menu() {
   $items['admin/config/services/statuscake'] = array(
-    'title' => 'Statuscake module settings',
-    'description' => 'Settings page for Statuscake push monitoring',
+    'title' => 'Statuscake',
+    'description' => 'Settings for Statuscake',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('statuscake_push_monitoring_form'),
     'access arguments' => array('administer statuscake settings'),
@@ -18,8 +18,7 @@ function statuscake_push_monitoring_menu() {
 }
 
 /**
- * Page callback: Current posts settings
- *
+ * Page callback: Settings page
  */
 
 function statuscake_push_monitoring_form($form, &$form_state) {
@@ -29,12 +28,18 @@ function statuscake_push_monitoring_form($form, &$form_state) {
     '#default_value' => variable_get('statuscake_push_monitoring_url'),
     '#size' => 70,
     '#maxlength' => 200,
-    '#description' => t("The URL from Statuscake settings page"),
+    '#description' => t("The URL from statuscake.com settings page"),
     '#required' => TRUE,
   );
 
+//check the inserted URL, ends with time=0 and it is an URL.
+
   return system_settings_form($form);
 }
+
+/**
+ * Converting time in microtime format
+ */
 
 function statuscake_push_monitoring_microtime_float(){
 			     list($usec, $sec) = explode(" ", microtime());
@@ -42,35 +47,43 @@ function statuscake_push_monitoring_microtime_float(){
 			 }
  
 /**
- * Implements hook_cron_queue_info_alter().
-*/
-/*
-function statuscake_push_monitoring_cron_queue_info_alter(&$queues){
-		$time_start = statuscake_push_monitoring_microtime_float();
-		array_unshift($queues, $time_start); 	
-		$statuscakeurl = variable_get('statuscake_push_monitoring_url');
-    drupal_http_request($statuscakeurl);
-		$time_end = statuscake_push_monitoring_microtime_float();
-		array_push($queues, $time_end);
-		$time = $time_end - $time_start;
-		drupal_set_message(print_r($time, TRUE)); 
-}
-*/
+ * Implements hook_cron_queue_info().
+ */
 
 function statuscake_push_monitoring_cron_queue_info() {
   $debug = debug_backtrace();
   if (!empty($debug[3]['function']) && $debug['3']['function'] == 'drupal_cron_run') {
+    //Getting start time in microseconds
     $time_start = statuscake_push_monitoring_microtime_float();
     array_unshift($debug, $time_start);
-    $statuscakeurl = variable_get('statuscake_push_monitoring_url');
+
+    //Getting end time in microseconds
     $time_end = statuscake_push_monitoring_microtime_float();
     array_push($debug, $time_end);
+
+    //Getting time elapsed from start to end
     $time = ($time_end - $time_start) * 1000;
-    $statuscakeurl_with_time = substr($statuscakeurl,0,-1) . $time;
-    //drupal_set_message(print_r($statuscakeurl_with_time, TRUE)); 
+
+//IF time == NULL ? 
+
+    //Inserting time variable in URL
+    $statuscakeurl = variable_get('statuscake_push_monitoring_url');
+    $statuscakeurl_with_time = substr($statuscakeurl, 0, -1) . $time;
+
+                  //drupal_set_message(print_r($statuscakeurl_with_time, TRUE)); 
+
+    //Visit URL
     drupal_http_request($statuscakeurl_with_time);
   }
-//drupal_set_message(print_r($debug, TRUE)); 
+                    //drupal_set_message(print_r($debug, TRUE)); 
+
+
+  else {
+
+  //!?!?
+
+  }
+
 }
 
 
