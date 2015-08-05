@@ -96,27 +96,22 @@ function statuscake_push_monitoring_cron_queue_info() {
     //Getting time elapsed from start to end in milliseconds
     $time = ($time_end - $time_start) * 1000;
 
-//IF time == NULL ? 
-
     //Inserting time variable in URL
     $statuscakeurl = variable_get('statuscake_push_monitoring_url');
     $statuscakeurl_with_time = substr($statuscakeurl, 0, -1) . $time;
 
-                  //drupal_set_message(print_r($statuscakeurl_with_time, TRUE)); 
-
     //Visit URL
     drupal_http_request($statuscakeurl_with_time);
   }
-                    //drupal_set_message(print_r($debug, TRUE)); 
-
-
-  else {
-
-  //!?!?
-
-  }
-
 }
 
-
-
+/**
+ * Implements hook_permission().
+ */
+function statuscake_push_monitoring_permission() {
+  return array(
+    'Statuscake' => array(
+      'title' => t('Administer URL settings'),
+    ),
+  );
+}
