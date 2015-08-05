@@ -38,9 +38,23 @@ function statuscake_push_monitoring_form($form, &$form_state) {
 }
 
 /**
- * Converting time in microtime format
+ * Implements validation handler.
+ *
+ * Validating the URL on module settings page
  */
+function statuscake_push_monitoring_settingspage_form_validate($form, &$form_state){
+  $url = $form_state['values']['statuscake_push_monitoring_url'];
+  if (!filter_var($url, FILTER_VALIDATE_URL) === false) {
+    drupal_set_message(t("@url is a valid URL", array('@url' => $url)));
+  }
+  else {
+    drupal_set_message(t('not valid URL'));
+  }
+}
 
+/**
+ * Converting time in microtime format.
+ */
 function statuscake_push_monitoring_microtime_float(){
 			     list($usec, $sec) = explode(" ", microtime());
 			     return ((float)$usec + (float)$sec);
