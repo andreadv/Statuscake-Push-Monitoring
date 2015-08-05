@@ -6,7 +6,7 @@
 function statuscake_push_monitoring_menu() {
   $items['admin/config/services/statuscake'] = array(
     'title' => 'Statuscake',
-    'description' => 'Settings for Statuscake',
+    'description' => 'Settings for statuscake',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('statuscake_push_monitoring_form'),
     'access arguments' => array('administer statuscake settings'),
@@ -24,12 +24,12 @@ function statuscake_push_monitoring_form(){
 }
 
 /**
- * Page callback: Settings page.
+ * Page callback: settings page.
  */
 function statuscake_push_monitoring_settingspage_form($form_state) {
   $form['statuscake_push_monitoring_url'] = array(
     '#type' => 'textfield',
-    '#title' => t('URL to PUSH to StatusCake Servers'),
+    '#title' => t('URL to PUSH to statuscake servers'),
     '#default_value' => variable_get('statuscake_push_monitoring_url'),
     '#size' => 70,
     '#maxlength' => 200,
@@ -46,14 +46,22 @@ function statuscake_push_monitoring_settingspage_form($form_state) {
 /**
  * Implements validation handler.
  *
- * Validating the URL on module settings page
+ * Validating the URL on module settings page.
  */
 function statuscake_push_monitoring_settingspage_form_validate($form, &$form_state){
   $url = $form_state['input']['statuscake_push_monitoring_url'];
-    //drupal_set_message(print_r($form_state, TRUE));
   if (!filter_var($url, FILTER_VALIDATE_URL) === false) {
-    drupal_set_message(t("@url is a valid URL", array('@url' => $url)));
-    statuscake_push_monitoring_settingspage_submit($form_state);
+
+    //Checking if the whole URL is part of the string.
+    if (strpos($url, 'time=0') == true) {
+      drupal_set_message(t("@url is a valid URL", array('@url' => $url)));
+      statuscake_push_monitoring_settingspage_submit($form_state); 
+    }
+    else{
+      drupal_set_message(t("Please check if you have copied the whole URL. \"@url\" is not valid.", array('@url' => $url)), 'error');
+      drupal_set_message(t("The form hasn't been submitted."), 'error');
+      return FALSE;
+    }
   }
   else {
     drupal_set_message(t("@url is not a valid URL", array('@url' => $url)), 'error');
@@ -110,7 +118,7 @@ function statuscake_push_monitoring_cron_queue_info() {
  */
 function statuscake_push_monitoring_permission() {
   return array(
-    'Statuscake' => array(
+    'statuscake' => array(
       'title' => t('Administer URL settings'),
     ),
   );
