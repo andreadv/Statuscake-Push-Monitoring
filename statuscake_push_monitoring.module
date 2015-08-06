@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Implements hook_menu().
@@ -11,7 +11,7 @@ function statuscake_push_monitoring_menu() {
     'page arguments' => array('statuscake_push_monitoring_form'),
     'access arguments' => array('administer statuscake settings'),
     'type' => MENU_NORMAL_ITEM,
-   );
+    );
 
   return $items;
 }
@@ -19,7 +19,7 @@ function statuscake_push_monitoring_menu() {
 /**
  * Returns the form.
  */
-function statuscake_push_monitoring_form(){
+function statuscake_push_monitoring_form() {
   return drupal_get_form('statuscake_push_monitoring_settingspage_form');
 }
 
@@ -48,14 +48,14 @@ function statuscake_push_monitoring_settingspage_form($form_state) {
  *
  * Validating the URL on module settings page.
  */
-function statuscake_push_monitoring_settingspage_form_validate($form, &$form_state){
+function statuscake_push_monitoring_settingspage_form_validate($form, &$form_state) {
   $url = $form_state['input']['statuscake_push_monitoring_url'];
-  if (!filter_var($url, FILTER_VALIDATE_URL) === false) {
+  if (!filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
 
     //Checking if the whole URL is part of the string.
-    if (strpos($url, 'time=0') == true) {
+    if (strpos($url, 'time=0') == TRUE) {
       drupal_set_message(t("@url is a valid URL", array('@url' => $url)));
-      statuscake_push_monitoring_settingspage_submit($form_state); 
+      statuscake_push_monitoring_settingspage_submit($form_state);
     }
     else{
       drupal_set_message(t("Please check if you have copied the whole URL. \"@url\" is not valid.", array('@url' => $url)), 'error');
@@ -73,7 +73,7 @@ function statuscake_push_monitoring_settingspage_form_validate($form, &$form_sta
 /**
  * Add a submit handler/function to the form.
  */
-function statuscake_push_monitoring_settingspage_submit(&$form_state) { 
+function statuscake_push_monitoring_settingspage_submit(&$form_state) {
   $url = $form_state['input']['statuscake_push_monitoring_url'];
   variable_set('statuscake_push_monitoring_url', $url);
   drupal_set_message(t('The form has been submitted.'));
@@ -81,8 +81,10 @@ function statuscake_push_monitoring_settingspage_submit(&$form_state) {
 
 /**
  * Converting time in microtime format.
+ *
+ * Sometimes cron runs so quickly that milliseconds are not enough.
  */
-function statuscake_push_monitoring_microtime_float(){
+function statuscake_push_monitoring_microtime_float() {
   list($usec, $sec) = explode(" ", microtime());
   return ((float)$usec + (float)$sec);
 }
@@ -93,21 +95,21 @@ function statuscake_push_monitoring_microtime_float(){
 function statuscake_push_monitoring_cron_queue_info() {
   $debug = debug_backtrace();
   if (!empty($debug[3]['function']) && $debug['3']['function'] == 'drupal_cron_run') {
-    //Getting start time in microseconds
+    //Getting start time in microseconds.
     $time_start = statuscake_push_monitoring_microtime_float();
     array_unshift($debug, $time_start);
 
-    //Getting end time in microseconds
+    //Getting end time in microseconds.
     $time_end = statuscake_push_monitoring_microtime_float();
     array_push($debug, $time_end);
 
-    //Getting time elapsed from start to end in milliseconds
+    //Getting time difference elapsed from time_start to time_end.
+    //Statuscake.com uses time in milliseconds.
     $time = ($time_end - $time_start) * 1000;
 
-    //Inserting time variable in URL
+    //Inserting time variable in URL.
     $statuscakeurl = variable_get('statuscake_push_monitoring_url');
-    $statuscakeurl_with_time = substr($statuscakeurl, 0, -1) . $time;
-
+    $statuscakeurl_with_time = drupal_substr($statuscakeurl, 0, -1) . $time;
     //Visit URL
     drupal_http_request($statuscakeurl_with_time);
   }
