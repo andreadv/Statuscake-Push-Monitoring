@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * The statuscake_push_monitoring module file.
+ */
 
 /**
  * Implements hook_menu().
@@ -11,7 +15,7 @@ function statuscake_push_monitoring_menu() {
     'page arguments' => array('statuscake_push_monitoring_settings_form'),
     'access arguments' => array('administer statuscake settings'),
     'type' => MENU_NORMAL_ITEM,
-    );
+  );
 
   return $items;
 }
@@ -83,7 +87,7 @@ function statuscake_push_monitoring_cron_queue_info() {
   $cron_runs = &drupal_static('statuscake_push_monitoring_cron_runs');
   $cron_runs = FALSE;
 
-  //Check if cron is running.
+  // Check if cron is running.
   $debug = debug_backtrace();
   if (statuscake_push_monitoring_part_of_array($debug, 'function', 'drupal_cron_run')) {
     $cron_runs = TRUE;
@@ -99,7 +103,7 @@ function statuscake_push_monitoring_exit() {
     $time_end = statuscake_push_monitoring_microtime_float();
     $time = ($time_end - $time_start) * 1000;
 
-    //Inserting $time variable in URL.
+    // nserting $time variable in URL.
     $statuscakeurl = variable_get('statuscake_push_monitoring_url');
     $url_info = parse_url($statuscakeurl);
     $query_values = array();
