@@ -39,7 +39,7 @@ function statuscake_push_monitoring_settings_form($form_state) {
  * Validating the URL on module settings page.
  */
 function statuscake_push_monitoring_settings_form_validate($form, &$form_state) {
-  $url = $form_state['input']['statuscake_push_monitoring_url'];
+  $url = $form_state['values']['statuscake_push_monitoring_url'];
   if (!filter_var($url, FILTER_VALIDATE_URL)) {
     form_set_error('statuscake_push_monitoring_url', t("@url is not a valid URL", array('@url' => $url)));
     return FALSE;
