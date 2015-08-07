@@ -9,6 +9,4 @@
  */
 function statuscake_push_monitoring_uninstall() {
   variable_del('statuscake_push_monitoring_url');
-  variable_del('cron_runs');
-  variable_del('time_start');
 }

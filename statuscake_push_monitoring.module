@@ -57,29 +57,22 @@ function statuscake_push_monitoring_microtime_float() {
 }
 
 /**
- * Save current time value with drupal_static.
- */
-function statuscake_push_monitoring_get_time() {
-  $time_value = &drupal_static(__FUNCTION__);
-  $time_value = statuscake_push_monitoring_microtime_float();
-  return $time_value;
-}
-
-/**
  * Implements hook_init().
  */
 function statuscake_push_monitoring_init() {
-  $time_start = statuscake_push_monitoring_get_time();
-  variable_set('time_start', $time_start);
+  $time_start = &drupal_static('statuscake_push_monitoring_start_time');
+  $time_start = statuscake_push_monitoring_microtime_float();
 }
 
 /**
  * Checking multidimensional array for key-value pair.
  */
 function statuscake_push_monitoring_part_of_array($array, $key, $val) {
-  foreach ($array as $item)
-    if (isset($item[$key]) && $item[$key] == $val)
-    return TRUE;
+  foreach ($array as $item) {
+    if (isset($item[$key]) && $item[$key] == $val) {
+      return TRUE;
+    }
+  }
   return FALSE;
 }
 
@@ -87,11 +80,13 @@ function statuscake_push_monitoring_part_of_array($array, $key, $val) {
  * Implements hook_cron_queue_info().
  */
 function statuscake_push_monitoring_cron_queue_info() {
-  $debug = debug_backtrace();
+  $cron_runs = &drupal_static('statuscake_push_monitoring_cron_runs');
+  $cron_runs = FALSE;
 
   //Check if cron is running.
+  $debug = debug_backtrace();
   if (statuscake_push_monitoring_part_of_array($debug, 'function', 'drupal_cron_run')) {
-    variable_set('cron_runs', TRUE);
+    $cron_runs = TRUE;
   }
 }
 
@@ -99,11 +94,10 @@ function statuscake_push_monitoring_cron_queue_info() {
  * Implements hook_exit().
  */
 function statuscake_push_monitoring_exit() {
- $cron_runs = variable_get('cron_runs');
- if ($cron_runs) {
-  $time_start = variable_get('time_start');
-  $time_end = statuscake_push_monitoring_get_time();
-  $time = ($time_end - $time_start) * 1000;
+  if (drupal_static('statuscake_push_monitoring_cron_runs')) {
+    $time_start = drupal_static('statuscake_push_monitoring_start_time');
+    $time_end = statuscake_push_monitoring_microtime_float();
+    $time = ($time_end - $time_start) * 1000;
 
     //Inserting $time variable in URL.
     $statuscakeurl = variable_get('statuscake_push_monitoring_url');
