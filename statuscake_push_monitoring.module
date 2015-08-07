@@ -59,7 +59,7 @@ function statuscake_push_monitoring_microtime_float() {
 /**
  * Save current time value with drupal_static.
  */
-function statuscake_push_monitoring_get_time(){
+function statuscake_push_monitoring_get_time() {
   $time_value = &drupal_static(__FUNCTION__);
   $time_value = statuscake_push_monitoring_microtime_float();
   return $time_value;
@@ -70,7 +70,6 @@ function statuscake_push_monitoring_get_time(){
  */
 function statuscake_push_monitoring_init() {
   $time_start = statuscake_push_monitoring_get_time();
-print 'start:' . print_r($time_start, True);
   variable_set('time_start', $time_start);
 }
 
@@ -92,7 +91,7 @@ function statuscake_push_monitoring_cron_queue_info() {
 
   //Check if cron is running.
   if (statuscake_push_monitoring_part_of_array($debug, 'function', 'drupal_cron_run')) {
-    variable_set('cron_runs', true);
+    variable_set('cron_runs', TRUE);
   }
 }
 
@@ -101,12 +100,10 @@ function statuscake_push_monitoring_cron_queue_info() {
  */
 function statuscake_push_monitoring_exit() {
  $cron_runs = variable_get('cron_runs');
- if($cron_runs){
+ if ($cron_runs) {
   $time_start = variable_get('time_start');
   $time_end = statuscake_push_monitoring_get_time();
-print 'end: ' . print_r($time_end, True);
   $time = ($time_end - $time_start) * 1000;
-print 'time: ' . $time;
 
     //Inserting $time variable in URL.
     $statuscakeurl = variable_get('statuscake_push_monitoring_url');
