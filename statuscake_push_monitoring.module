@@ -103,7 +103,7 @@ function statuscake_push_monitoring_exit() {
     $time_end = statuscake_push_monitoring_microtime_float();
     $time = ($time_end - $time_start) * 1000;
 
-    // nserting $time variable in URL.
+    // Inserting $time variable in URL.
     $statuscakeurl = variable_get('statuscake_push_monitoring_url');
     $url_info = parse_url($statuscakeurl);
     $query_values = array();
