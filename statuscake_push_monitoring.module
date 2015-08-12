@@ -69,36 +69,11 @@ function statuscake_push_monitoring_init() {
 }
 
 /**
- * Checking multidimensional array for key-value pair.
+ * Implements hook_watchdog().
  */
-function statuscake_push_monitoring_part_of_array($array, $key, $val) {
-  foreach ($array as $item) {
-    if (isset($item[$key]) && $item[$key] == $val) {
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-/**
- * Implements hook_cron_queue_info().
- */
-function statuscake_push_monitoring_cron_queue_info() {
-  $cron_runs = &drupal_static('statuscake_push_monitoring_cron_runs');
-  $cron_runs = FALSE;
-
-  // Check if cron is running.
-  $debug = debug_backtrace();
-  if (statuscake_push_monitoring_part_of_array($debug, 'function', 'drupal_cron_run')) {
-    $cron_runs = TRUE;
-  }
-}
-
-/**
- * Implements hook_exit().
- */
-function statuscake_push_monitoring_exit() {
-  if (drupal_static('statuscake_push_monitoring_cron_runs')) {
+function statuscake_push_monitoring_watchdog(array $log_entry) {
+  if (($log_entry['type'] == 'cron') && ($log_entry['message'] == 'Cron run completed.')) {
+    // Perform StatusCake update here.
     $time_start = drupal_static('statuscake_push_monitoring_start_time');
     $time_end = statuscake_push_monitoring_microtime_float();
     $time = ($time_end - $time_start) * 1000;

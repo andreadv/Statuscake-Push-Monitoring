@@ -15,7 +15,7 @@ Implementing Statuscake push monitoring services.
 Push monitoring is a service where Drupal is pinging statuscake.
 If statuscake is not gettting pings for a timeframe, you will get alerted.
 
-To set the service up you need an account at stauscake.com.
+To set the service up you need an account at statuscake.com.
 
 Statuscake allows to submit a time, which is shown in the detailed test
 information charts. The module automatically measures the cron run time,
@@ -31,8 +31,8 @@ INSTALLATION
 
 CONFIGURATION
 -------------
- * Customize user permissions to edit the URL in Administration » People »
-   Permissions.
+ * Grant the 'Administer StatusCake settings' permission to users
+ who should have access to the StatusCake configuration.
 
  * Create a new push test at statuscake.com
 
