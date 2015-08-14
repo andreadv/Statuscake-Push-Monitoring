@@ -69,12 +69,17 @@ function statuscake_push_monitoring_init() {
 }
 
 /**
- * Implements hook_watchdog().
+ * Implements hook_cron().
  */
-function statuscake_push_monitoring_watchdog(array $log_entry) {
-  if (($log_entry['type'] == 'cron') && ($log_entry['message'] == 'Cron run completed.')) {
-    // Perform StatusCake update here.
-    $time_start = drupal_static('statuscake_push_monitoring_start_time');
+function statuscake_push_monitoring_cron() {
+drupal_register_shutdown_function(statuscake_push_monitoring_push_url());
+}
+
+/**
+ * Implements new function: statuscake_push_monitoring_push_url().
+ */
+function statuscake_push_monitoring_push_url() {
+  $time_start = drupal_static('statuscake_push_monitoring_start_time');
     $time_end = statuscake_push_monitoring_microtime_float();
     $time = ($time_end - $time_start) * 1000;
 
@@ -86,7 +91,6 @@ function statuscake_push_monitoring_watchdog(array $log_entry) {
     $query_values['time'] = $time;
     $statuscakeurl_with_time = url($url_info['scheme'] . '://' . $url_info['host'] . $url_info['path'] . '?' . drupal_http_build_query($query_values));
     drupal_http_request($statuscakeurl_with_time);
-  }
 }
 
 /**
