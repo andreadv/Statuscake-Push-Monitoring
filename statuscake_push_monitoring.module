@@ -51,9 +51,8 @@ function statuscake_push_monitoring_settings_form_validate($form, &$form_state) 
 }
 
 /**
- * @return float
+ *   @return float
  * Converting time in microtime format.
- *
  */
 function statuscake_push_monitoring_microtime_float() {
   list($usec, $sec) = explode(" ", microtime());
@@ -76,9 +75,9 @@ function statuscake_push_monitoring_cron() {
 }
 
 /**
- * @see http://kb.statuscake.com/hc/en-us/articles/203808141-Push-Monitoring
- *
  * Implements new function: statuscake_push_monitoring_push_url().
+ *
+ * @see http://kb.statuscake.com/hc/en-us/articles/203808141-Push-Monitoring
  */
 function statuscake_push_monitoring_push_url() {
   $time_start = drupal_static('statuscake_push_monitoring_start_time');
@@ -86,7 +85,7 @@ function statuscake_push_monitoring_push_url() {
   $time = ($time_end - $time_start) * 1000;
   // Inserting $time variable in URL.
   $statuscakeurl = variable_get('statuscake_push_monitoring_url');
-  $url_info = explode( '?', $statuscakeurl);
+  $url_info = explode('?', $statuscakeurl);
   $query_values = array();
   parse_str($url_info[1], $query_values);
   $query_values['time'] = $time;
