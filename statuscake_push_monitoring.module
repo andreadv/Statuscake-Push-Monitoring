@@ -27,7 +27,7 @@ function statuscake_push_monitoring_settings_form($form_state) {
   $form['statuscake_push_monitoring_url'] = array(
     '#type' => 'textfield',
     '#title' => t('URL to PUSH to statuscake servers'),
-    '#default_value' => variable_get('statuscake_push_monitoring_url'),
+    '#default_value' => variable_get('statuscake_push_monitoring_url', 'Insert URL from statuscake'),
     '#size' => 70,
     '#description' => t("The URL from statuscake.com settings page"),
     '#required' => TRUE,
@@ -51,13 +51,13 @@ function statuscake_push_monitoring_settings_form_validate($form, &$form_state) 
 }
 
 /**
+ * @return float
  * Converting time in microtime format.
  *
- * Sometimes cron runs so quickly that milliseconds are not enough.
  */
 function statuscake_push_monitoring_microtime_float() {
   list($usec, $sec) = explode(" ", microtime());
-  return ((float)$usec + (float)$sec);
+  return ((float) $usec + (float) $sec);
 }
 
 /**
@@ -72,25 +72,26 @@ function statuscake_push_monitoring_init() {
  * Implements hook_cron().
  */
 function statuscake_push_monitoring_cron() {
-drupal_register_shutdown_function(statuscake_push_monitoring_push_url());
+  drupal_register_shutdown_function(statuscake_push_monitoring_push_url());
 }
 
 /**
+ * @see http://kb.statuscake.com/hc/en-us/articles/203808141-Push-Monitoring
+ *
  * Implements new function: statuscake_push_monitoring_push_url().
  */
 function statuscake_push_monitoring_push_url() {
   $time_start = drupal_static('statuscake_push_monitoring_start_time');
-    $time_end = statuscake_push_monitoring_microtime_float();
-    $time = ($time_end - $time_start) * 1000;
-
-    // Inserting $time variable in URL.
-    $statuscakeurl = variable_get('statuscake_push_monitoring_url');
-    $url_info = parse_url($statuscakeurl);
-    $query_values = array();
-    parse_str($url_info['query'], $query_values);
-    $query_values['time'] = $time;
-    $statuscakeurl_with_time = url($url_info['scheme'] . '://' . $url_info['host'] . $url_info['path'] . '?' . drupal_http_build_query($query_values));
-    drupal_http_request($statuscakeurl_with_time);
+  $time_end = statuscake_push_monitoring_microtime_float();
+  $time = ($time_end - $time_start) * 1000;
+  // Inserting $time variable in URL.
+  $statuscakeurl = variable_get('statuscake_push_monitoring_url');
+  $url_info = explode( '?', $statuscakeurl);
+  $query_values = array();
+  parse_str($url_info[1], $query_values);
+  $query_values['time'] = $time;
+  $statuscakeurl_with_time = url($url_info[0] . '?' . drupal_http_build_query($query_values));
+  drupal_http_request($statuscakeurl_with_time);
 }
 
 /**
