@@ -46,13 +46,14 @@ function statuscake_push_monitoring_settings_form_validate($form, &$form_state) 
   $url = $form_state['values']['statuscake_push_monitoring_url'];
   if (!filter_var($url, FILTER_VALIDATE_URL)) {
     form_set_error('statuscake_push_monitoring_url', t("@url is not a valid URL", array('@url' => $url)));
-    return FALSE;
   }
 }
 
 /**
- *   @return float
- * Converting time in microtime format.
+ * Implements function to calculate microtime format.
+ *
+ * @return float
+ *   Converting time in microtime format.
  */
 function statuscake_push_monitoring_microtime_float() {
   list($usec, $sec) = explode(" ", microtime());
@@ -61,6 +62,8 @@ function statuscake_push_monitoring_microtime_float() {
 
 /**
  * Implements hook_init().
+ *
+ * Starting timer on every page request.
  */
 function statuscake_push_monitoring_init() {
   $time_start = &drupal_static('statuscake_push_monitoring_start_time');
